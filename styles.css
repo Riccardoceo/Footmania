@@ -1,0 +1,366 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.controls-header {
+    background-color: #2a2a2a;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    border-bottom: 1px solid #404040;
+    flex-shrink: 0;
+}
+
+.symbol-controls select {
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #555;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.timeframe-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeframe-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.timeframe-btn {
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #555;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timeframe-btn:hover {
+    background-color: #4a4a4a;
+}
+
+.timeframe-btn.active {
+    background-color: #0078d4;
+    border-color: #0078d4;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.chart-controls button {
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #555;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chart-controls button:hover {
+    background-color: #4a4a4a;
+}
+
+.trade-bubble-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background-color: #333;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+
+.footprint-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    background-color: #333;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+
+.trade-bubble-controls label,
+.footprint-controls label {
+    font-size: 13px;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.trade-bubble-controls input[type="range"] {
+    width: 100px;
+    height: 4px;
+    background: #555;
+    outline: none;
+    -webkit-appearance: none;
+    border-radius: 2px;
+}
+
+.trade-bubble-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #0078d4;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.trade-bubble-controls input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #0078d4;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+}
+
+.trade-bubble-controls input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.trade-bubble-controls #threshold-value {
+    color: #0078d4;
+    font-weight: bold;
+    min-width: 30px;
+}
+
+.chart-container {
+    flex: 1;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.chart-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#candlestickChart {
+    width: 100% !important;
+    height: 100% !important;
+    transition: cursor 0.1s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Help Overlay */
+.chart-help-overlay {
+    position: absolute;
+    bottom: 60px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    font-size: 12px;
+    z-index: 100;
+    max-width: 300px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.chart-help-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.chart-help-overlay h3 {
+    margin: 0 0 10px 0;
+    color: #0078d4;
+    font-size: 14px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.chart-help-overlay .help-section {
+    margin: 8px 0;
+}
+
+.chart-help-overlay .help-section strong {
+    color: #4caf50;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.chart-help-overlay .help-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    color: #ccc;
+}
+
+.chart-help-overlay .help-item .key {
+    color: #ffa726;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+/* Zoom indicator */
+.zoom-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.zoom-indicator.visible {
+    opacity: 1;
+}
+
+.chart-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #404040;
+    max-width: 300px;
+    font-size: 14px;
+    z-index: 10;
+}
+
+.chart-info h2 {
+    margin: 0 0 10px 0;
+    color: #0078d4;
+}
+
+.chart-info ul {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+}
+
+.chart-info li {
+    margin: 5px 0;
+    color: #cccccc;
+}
+
+.status-bar {
+    background-color: #2a2a2a;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #404040;
+    flex-shrink: 0;
+}
+
+.loading-indicator {
+    color: #0078d4;
+    display: none;
+}
+
+.loading-indicator.active {
+    display: block;
+}
+
+.price-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.price-info span {
+    font-weight: 500;
+}
+
+#current-price {
+    font-size: 18px;
+    color: #4caf50;
+}
+
+#price-change.positive {
+    color: #4caf50;
+}
+
+#price-change.negative {
+    color: #f44336;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .controls-header {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .timeframe-buttons {
+        flex-wrap: wrap;
+    }
+    
+    .chart-controls {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
