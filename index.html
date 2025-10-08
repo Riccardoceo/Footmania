@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Candlestick Chart - Binance Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="controls-header">
+            <div class="symbol-controls">
+                <label for="symbol-select">Symbol:</label>
+                <select id="symbol-select">
+                    <option value="BTCUSDT">BTC/USDT</option>
+                    <option value="ETHUSDT">ETH/USDT</option>
+                    <option value="SUIUSDT">SUI/USDT</option>
+                    <option value="ADAUSDT">ADA/USDT</option>
+                    <option value="DOGEUSDT">DOGE/USDT</option>
+                    <option value="SOLUSDT">SOL/USDT</option>
+                    <option value="DOTUSDT">DOT/USDT</option>
+                </select>
+            </div>
+            
+            <div class="timeframe-controls">
+                <label>Time Frame:</label>
+                <div class="timeframe-buttons">
+                    <button class="timeframe-btn active" data-interval="1m">1m</button>
+                    <button class="timeframe-btn" data-interval="5m">5m</button>
+                    <button class="timeframe-btn" data-interval="15m">15m</button>
+                    <button class="timeframe-btn" data-interval="1h">1h</button>
+                    <button class="timeframe-btn" data-interval="4h">4h</button>
+                    <button class="timeframe-btn" data-interval="1d">1d</button>
+                    <button class="timeframe-btn" data-interval="1w">1w</button>
+                </div>
+            </div>
+            
+            <div class="chart-controls">
+                <button id="zoom-in">Zoom In</button>
+                <button id="zoom-out">Zoom Out</button>
+                <button id="reset-zoom">Reset Zoom</button>
+                <button id="load-more">Load More</button>
+                <button id="refresh-data">Refresh</button>
+                <button id="help-btn" title="Show keyboard shortcuts">❓ Help</button>
+            </div>
+
+            <div class="trade-bubble-controls">
+                <label for="trade-threshold">Min Trade Size:</label>
+                <input type="range" id="trade-threshold" min="0" max="5" step="0.01" value="0.01">
+                <span id="threshold-value">0.01</span>
+                
+                <label for="max-bubbles">Max Bubbles:</label>
+                <input type="range" id="max-bubbles" min="5" max="30" step="1" value="15">
+                <span id="max-bubbles-value">15</span>
+                
+                <label>
+                    <input type="checkbox" id="show-trades" checked>
+                    Show Trade Bubbles
+                </label>
+            </div>
+            
+            <div class="footprint-controls">
+                <label>
+                    <input type="checkbox" id="footprint-mode">
+                    Footprint Chart
+                </label>
+                
+                <label for="footprint-layers">Max Price Levels:</label>
+                <input type="range" id="footprint-layers" min="20" max="160" step="10" value="80">
+                <span id="footprint-layers-value">80</span>
+                
+                <label>
+                    <input type="checkbox" id="show-volume-delta" checked>
+                    Volume Delta
+                </label>
+            </div>
+        </header>
+
+        <div class="chart-container">
+            <div class="chart-wrapper">
+                <canvas id="candlestickChart"></canvas>
+                
+                <!-- Help Overlay -->
+                <div class="chart-help-overlay" id="help-overlay">
+                    <h3>🎯 TradingView-Style Controls</h3>
+                    
+                    <div class="help-section">
+                        <strong>Zoom:</strong>
+                        <div class="help-item">
+                            <span>Mouse Wheel</span>
+                            <span class="key">Scroll Up/Down</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Trackpad Pinch</span>
+                            <span class="key">Ctrl + Scroll</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Zoom In</span>
+                            <span class="key">+ or =</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Zoom Out</span>
+                            <span class="key">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <strong>Pan:</strong>
+                        <div class="help-item">
+                            <span>Drag Chart</span>
+                            <span class="key">Click + Drag</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Trackpad Scroll</span>
+                            <span class="key">Two-Finger Swipe</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Space Pan</span>
+                            <span class="key">Space + Drag</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Pan Left/Right</span>
+                            <span class="key">← →</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Horizontal Scroll</span>
+                            <span class="key">Shift + Scroll</span>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <strong>Scale:</strong>
+                        <div class="help-item">
+                            <span>Y-Axis (Price)</span>
+                            <span class="key">Right Edge Drag</span>
+                        </div>
+                        <div class="help-item">
+                            <span>X-Axis (Time)</span>
+                            <span class="key">Bottom Edge Drag</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Stretch Price Up</span>
+                            <span class="key">↑</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Squeeze Price</span>
+                            <span class="key">↓</span>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <strong>Mobile/Touch:</strong>
+                        <div class="help-item">
+                            <span>Pan</span>
+                            <span class="key">One Finger Swipe</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Zoom</span>
+                            <span class="key">Pinch In/Out</span>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <strong>Other:</strong>
+                        <div class="help-item">
+                            <span>Auto-Fit</span>
+                            <span class="key">Double-Click</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Toggle Help</span>
+                            <span class="key">H</span>
+                        </div>
+                    </div>
+                    
+                    <div class="help-section">
+                        <strong>Footprint Chart:</strong>
+                        <div class="help-item">
+                            <span>Enable footprint & zoom in</span>
+                            <span class="key">60px+ candles</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Shows buy/sell layers</span>
+                            <span class="key">Green/Red cells</span>
+                        </div>
+                        <div class="help-item">
+                            <span>Volume Delta on top</span>
+                            <span class="key">Δ in asset units</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+                        <div class="loading-indicator" id="loading" style="display: none;">Loading chart...</div>
+            <div class="price-info" id="price-info">
+                <span id="current-price">--</span>
+                <span id="price-change">--</span>
+                <span id="volume">Volume: --</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="working-candlestick.js"></script>
+</body>
+</html>
